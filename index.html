@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>bacgam calculator</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="calculator.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="bacgam calculator 홈">bacgam calculator</a>
+    </header>
+    <main aria-label="bacgam calculator">
+      <form id="trade-form" novalidate>
+        <fieldset class="ratio-field"><legend>손익비 선택 <span class="label-hint">손실 : 이익</span></legend><div class="ratio-options">
+          <label class="ratio-option"><input type="radio" name="ratio" value="1"><span><strong>1 : 1</strong><small>손절액의 1배 수익</small><i aria-hidden="true">✓</i></span></label>
+          <label class="ratio-option"><input type="radio" name="ratio" value="2" checked><span><strong>1 : 2</strong><small>손절액의 2배 수익</small><i aria-hidden="true">✓</i></span></label>
+          <label class="ratio-option"><input type="radio" name="ratio" value="3"><span><strong>1 : 3</strong><small>손절액의 3배 수익</small><i aria-hidden="true">✓</i></span></label>
+          <div class="custom-ratio-option"><input id="custom-ratio" type="radio" name="ratio" value="2" hidden><button id="custom-ratio-button" type="button" aria-haspopup="dialog" aria-controls="ratio-dialog" aria-pressed="false"><strong>커스텀 손익비</strong><small id="custom-ratio-description">직접 설정</small><i aria-hidden="true">✓</i></button></div>
+        </div></fieldset>
+      <div class="workspace">
+        <section class="card input-card" aria-labelledby="input-heading">
+          <div class="section-heading"><span class="step">01</span><h2 id="input-heading">거래 설정</h2><span class="small-tag">USDT 기준</span></div>
+            <fieldset class="mode-field" aria-label="손절액 계산 기준"><div class="direction-options">
+              <label class="direction-option"><input type="radio" name="mode" value="amount" checked><span>손절액 기준</span></label>
+              <label class="direction-option"><input type="radio" name="mode" value="seed"><span>전체시드 비율기준</span></label>
+            </div></fieldset>
+            <fieldset class="direction-field" aria-label="포지션 방향"><div class="direction-options">
+              <label class="direction-option long-option"><input type="radio" name="side" value="long" checked><span><b aria-hidden="true">↗</b> 롱 <small>Long</small></span></label>
+              <label class="direction-option short-option"><input type="radio" name="side" value="short"><span><b aria-hidden="true">↘</b> 숏 <small>Short</small></span></label>
+            </div></fieldset>
+            <div class="field"><label for="entry">진입가</label><div class="input-wrap"><input id="entry" name="entry" type="text" inputmode="decimal" value="65,000" placeholder="진입할 가격" required aria-describedby="entry-error"><span>USDT</span></div><p class="field-error" id="entry-error"></p></div>
+            <div class="field"><label for="stop">손절가 <span class="label-hint">손절할 가격</span></label><div class="input-wrap"><input id="stop" name="stop" type="text" inputmode="decimal" value="64,000" placeholder="손절할 가격" required aria-describedby="stop-error"><span>USDT</span></div><p class="field-error" id="stop-error"></p></div>
+            <div id="amount-risk-fields"><div class="field"><label for="risk">손절액 <span class="label-hint">감수할 손실 금액</span></label><div class="input-wrap"><input id="risk" name="risk" type="text" inputmode="decimal" value="100" placeholder="손실을 감수할 금액" required aria-describedby="risk-error"><span>USDT</span></div><p class="field-error" id="risk-error"></p></div></div>
+            <div id="seed-risk-fields" hidden>
+              <div class="field"><label for="seed">전체시드 <span class="label-hint">전체 자산 금액</span></label><div class="input-wrap"><input id="seed" name="seed" type="text" inputmode="decimal" value="10,000" placeholder="전체 시드 금액" required disabled aria-describedby="seed-error"><span>USDT</span></div><p class="field-error" id="seed-error"></p></div>
+              <div class="field"><label for="risk-percent">손절율 <span class="label-hint">전체시드에서 감수할 손실 비율</span></label><div class="input-wrap"><input id="risk-percent" name="riskPercent" type="text" inputmode="decimal" value="1" placeholder="시드 대비 손절 비율" required disabled aria-describedby="risk-percent-error seed-risk-note"><span>%</span></div><p class="field-error" id="risk-percent-error"></p></div>
+              <p id="seed-risk-note" class="seed-risk-note">손절액 = 전체시드 × 손절율 ÷ 100</p>
+            </div>
+            <div class="live-note">입력하거나 선택하면 결과가 바로 반영됩니다.</div>
+        </section>
+        <section class="card result-card" aria-labelledby="result-heading">
+          <div class="section-heading"><span class="step">02</span><h2 id="result-heading">포지션 플랜</h2><span class="result-badge" id="result-badge">LONG · 1:2</span></div>
+          <div class="position-summary">
+            <div class="position-main" aria-live="polite" aria-atomic="true"><span class="summary-label">포지션 진입크기 <span>총 진입금액</span></span><div class="position-value"><strong id="position-value">6,500</strong><span>USDT</span></div><div class="position-meta"><span>진입 수량 <b id="quantity-value">0.1</b></span><span class="meta-divider"></span><span>손절까지 <b id="distance-value">1.54%</b></span></div></div>
+            <fieldset class="margin-controls"><legend>(optional)</legend><div class="margin-fields">
+              <div class="leverage-field"><label for="leverage">Leverage</label><div class="leverage-box"><input id="leverage" name="leverage" type="text" inputmode="decimal" placeholder="—" aria-describedby="leverage-error" aria-label="Leverage 배율 (선택사항)"><span aria-hidden="true">×</span></div></div>
+              <div class="margin-field"><label for="margin-value">Margin</label><div class="margin-box"><output id="margin-value" for="leverage entry stop risk seed risk-percent" aria-live="polite">—</output><span>USDT</span></div></div>
+              <p class="leverage-error" id="leverage-error" role="status"></p>
+            </div></fieldset>
+          </div>
+          <div id="result-error" class="result-error" role="status" hidden></div>
+          <div class="chart-section"><div class="chart-heading"><h3>손익 시나리오</h3><span>가격 상승 <b aria-hidden="true">↑</b></span></div>
+            <div class="scenario" id="scenario" role="img" aria-label="롱 포지션: 진입가 65000, 익절가 67000, 손절가 64000">
+              <div class="price-rail"><div class="zone top-zone" id="top-zone"><span id="top-zone-text">PROFIT</span></div><div class="zone bottom-zone" id="bottom-zone"><span id="bottom-zone-text">LOSS</span></div><div class="entry-tick"></div></div>
+              <div class="level top-level" id="top-level"><div class="price-label"><small id="top-title">익절가</small><strong id="top-price">67,000</strong></div><div class="level-line"></div><div class="pnl-label"><strong id="top-amount">+200</strong><small>USDT <span id="top-change">+3.08%</span></small></div></div>
+              <div class="level entry-level"><div class="price-label"><small>진입가</small><strong id="chart-entry">65,000</strong></div><div class="level-line"></div><div class="entry-label"><span class="entry-dot"></span> ENTRY</div></div>
+              <div class="level bottom-level" id="bottom-level"><div class="price-label"><small id="bottom-title">손절가</small><strong id="bottom-price">64,000</strong></div><div class="level-line"></div><div class="pnl-label"><strong id="bottom-amount">−100</strong><small>USDT <span id="bottom-change">−1.54%</span></small></div></div>
+            </div>
+          </div>
+          <div class="result-grid" aria-live="polite" aria-atomic="true">
+            <div class="result-item"><span><i class="legend-dot loss"></i>손절가</span><strong id="stop-result">64,000 <small>USDT</small></strong></div>
+            <div class="result-item"><span><i class="legend-dot profit"></i>익절가</span><strong id="target-result">67,000 <small>USDT</small></strong></div>
+            <div class="result-item"><span><i class="legend-dot loss"></i>손절액</span><strong class="loss-text" id="risk-result">−100 <small>USDT</small></strong></div>
+            <div class="result-item"><span><i class="legend-dot profit"></i>익절액</span><strong class="profit-text" id="reward-result">+200 <small>USDT</small></strong></div>
+          </div>
+        </section>
+      </div>
+      </form>
+      <aside class="calculation-note"><span class="info-icon" aria-hidden="true">i</span><div><strong>포지션 크기는 이렇게 계산해요</strong><p>진입 수량 = 손절액 ÷ |진입가 − 손절가| &nbsp;·&nbsp; 진입금액 = 진입 수량 × 진입가</p><p class="note-detail">가격 × 수량으로 손익을 계산하는 선형 상품 기준입니다. 수수료·슬리피지·펀딩비는 제외되며, 진입금액은 레버리지 적용 전 포지션 총액입니다.</p></div></aside>
+    </main>
+    <footer><span>bacgam calculator</span><span>뭘 모르나 본데, 너가 내려야 출발한다고</span></footer>
+  </div>
+  <dialog id="ratio-dialog" aria-labelledby="ratio-dialog-title" aria-describedby="ratio-dialog-description">
+    <div class="dialog-heading"><h2 id="ratio-dialog-title">커스텀 손익비</h2><button id="ratio-dialog-close" class="dialog-close" type="button" aria-label="닫기">×</button></div>
+    <p id="ratio-dialog-description">마우스 휠을 움직여 손익비를 선택하세요.</p>
+    <div class="ratio-picker">
+      <span class="picker-prefix" aria-hidden="true">1 :</span>
+      <div id="ratio-wheel" class="ratio-wheel" role="spinbutton" tabindex="0" aria-label="커스텀 손익비 배수" aria-valuemin="0.5" aria-valuemax="10" aria-valuenow="2" aria-valuetext="1 대 2" aria-describedby="ratio-picker-hint">
+        <div id="wheel-track" class="wheel-track" aria-hidden="true"></div>
+      </div>
+      <div class="picker-arrows"><button id="ratio-increase" type="button" aria-label="손익비 0.5 증가">↑</button><button id="ratio-decrease" type="button" aria-label="손익비 0.5 감소">↓</button></div>
+    </div>
+    <p id="ratio-picker-hint" class="picker-hint">0.5 단위 · 최대 1:10<br>↑ ↓ 키 또는 위아래 드래그로도 조절할 수 있습니다.</p>
+    <div class="dialog-actions"><button id="ratio-cancel" type="button">취소</button><button id="ratio-apply" type="button">적용</button></div>
+  </dialog>
+</body>
+</html>
